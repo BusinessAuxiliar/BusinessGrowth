@@ -1,7 +1,7 @@
 import { View, Text, Image } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
-import { icons } from "../../assets/icons/index"; 
+import { icons } from "../../constants/index";
 
 const TabIcon = ({ icon, color, name, focused }) => {
   return (
@@ -12,7 +12,9 @@ const TabIcon = ({ icon, color, name, focused }) => {
         tintColor={color}
         className="w-6 h-6"
       />
-      <Text className={`${focused ? "font-psemibold" : "font-pregular"} text-xs`}>
+      <Text
+        className={`${focused ? "font-psemibold" : "font-pregular"} text-xs`}
+        style={{color: color}}      >
         {name}
       </Text>
     </View>
@@ -21,21 +23,34 @@ const TabIcon = ({ icon, color, name, focused }) => {
 
 const TabsLayout = () => {
   return (
-    <Tabs screenOptions={{ tabBarShowLabel: false }}>
+    <Tabs
+      screenOptions={{
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: "#FF0080",
+        tabBarInactiveTintColor: "#CDCDE0",
+
+        tabBarStyle: {
+          backgroundColor: "#161622",
+          borderTopWidth: 1,
+          borderTopColor: "#232533",
+          height: 84,
+        },
+      }}
+    >
       <Tabs.Screen
         name="home"
         options={{
           title: "Home",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => {
-            return (  
+            return (
               <TabIcon
                 icon={icons.home}
                 color={color}
                 name="Home"
                 focused={focused}
               />
-            );
+            );  
           },
         }}
       />
@@ -45,7 +60,7 @@ const TabsLayout = () => {
           title: "Bookmark",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => {
-            return (  
+            return (
               <TabIcon
                 icon={icons.bookmark}
                 color={color}
@@ -62,7 +77,7 @@ const TabsLayout = () => {
           title: "Create",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => {
-            return (  
+            return (
               <TabIcon
                 icon={icons.plus}
                 color={color}
