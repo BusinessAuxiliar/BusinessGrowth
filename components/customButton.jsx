@@ -12,9 +12,10 @@ const CustomButton = ({
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.7}
+      className={`justify-center items-center ${containerStyles} ${isLoading? 'opacity-50' : ''}`}
       disabled={isLoading}
-      className={`justify-center items-center ${containerStyles}`}
       style={{
+        
         backgroundColor: '#F50B58', // Reemplazá con el color que quieras
         borderRadius: 16,            // Radio redondeado manual
         minHeight: 62,
