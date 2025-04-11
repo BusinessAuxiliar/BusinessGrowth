@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import CustomButton from "../../components/customButton";
-import { Link } from "expo-router";
-
+import { Link, router } from "expo-router";
 import {
+  Platform,
   View,
   Text,
   Image,
-  ScrollView,
   KeyboardAvoidingView,
-  Platform,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
@@ -18,93 +16,109 @@ import constants from "../../constants";
 import FormField from "../../components/formField";
 
 const SignUp = () => {
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [isSubmitting, setisSubmiting] = useState(false);
+  const submit = async () => {
+    if (!form.username || !form.email || !form.password) {
+      alert("Completá todos los campos");
+      return;
+    }
 
-  const submit = () => {};
+    setIsSubmitting(true);
 
-  const FormContent = () => (
-    <ScrollView
-      keyboardShouldPersistTaps="handled"
-      contentContainerStyle={{ flexGrow: 1 }}
-    >
-      <View className="w-full justify-center px-4 py-6 flex-1">
-        <Image
-          source={constants.images.logoLargo}
-          resizeMode="contain"
-          className="w-3/4 max-w-[250px] h-16 self-center"
-        />
-        <Text className="text-2xl text-white font-psemibold mt-10 mb-5">
-          Registrate en BusinessGrowth
-        </Text>
+    try {
+      const res = await fetch("http://192.168.100.37:3001/sign-up", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-        <FormField
-          title="Username"
-          placeholder="Ingresá tu nombre"
-          value={form.username}
-          handleChangeText={(e) => setForm({ ...form, username: e })}
-          otherStyles="mt-10"
-        />
+      const data = await res.json();
 
-        <FormField
-          title="Email"
-          placeholder="Ingresá tu email"
-          value={form.email}
-          handleChangeText={(e) => setForm({ ...form, email: e })}
-          otherStyles="mt-7"
-          keyboardType="email-address"
-        />
-
-        <FormField
-          title="Password"
-          value={form.password}
-          placeholder="Ingresá tu contraseña"
-          handleChangeText={(e) => setForm({ ...form, password: e })}
-        />
-
-        <CustomButton
-          title="Registrarme"
-          handlePress={submit}
-          containerStyles="mt-7"
-          isLoading={isSubmitting}
-        />
-
-        <View className="justify-center pt-5 flex-row gap-2">
-          <Text className="text-lg text-gray-100 font-pregular">
-            ¿Ya tenés una cuenta?
-          </Text>
-
-          <Link
-            href="/sign-in"
-            className="text-lg font-psemibold  text-secondary"
-          >
-            Ingresar a Business Growth
-          </Link>
-        </View>
-      </View>
-    </ScrollView>
-  );
+      if (res.ok) {
+        alert(`Usuario registrado: ${data.username}`);
+        router.replace("/home");
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Error en registro:", error);
+      alert("Ocurrió un error. Intentá más tarde.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <SafeAreaView className="bg-[#161622] flex-1">
       <StatusBar backgroundColor="#161622" />
-
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
-        {Platform.OS !== "web" ? (
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            {FormContent()}
-          </TouchableWithoutFeedback>
-        ) : (
-          FormContent()
-        )}
+        <TouchableWithoutFeedback
+          onPress={Platform.OS !== "web" ? Keyboard.dismiss : undefined}
+          accessible={false}
+        >
+          <View className="flex-1 justify-center px-4 py-6">
+            <Image
+              source={constants.images.logo}
+              style={{
+                width: 280,
+                height: 140,
+                alignSelf: "center",
+                marginBottom: 30,
+              }}
+              resizeMode="contain"
+            />
+            <Text className="text-2xl text-white font-psemibold mb-5">
+              Creá tu cuenta
+            </Text>
+
+            <FormField
+              title="USUARIO"
+              placeholder="Ingresá tu nombre de usuario"
+              value={form.username}
+              handleChangeText={(e) => setForm({ ...form, username: e })}
+              otherStyles="mb-4"
+            />
+
+            <FormField
+              title="EMAIL"
+              placeholder="Ingresá tu email"
+              value={form.email}
+              handleChangeText={(e) => setForm({ ...form, email: e })}
+              otherStyles="mb-4"
+            />
+
+            <FormField
+              title="CONTRASEÑA"
+              placeholder="Ingresá tu contraseña"
+              value={form.password}
+              handleChangeText={(e) => setForm({ ...form, password: e })}
+            />
+
+            <CustomButton
+              title="Registrarse"
+              handlePress={submit}
+              containerStyles="mt-7"
+              isLoading={isSubmitting}
+            />
+
+            <View className="justify-center pt-5 flex-row gap-2">
+              <Text className="text-lg text-gray-100 font-pregular">
+                ¿Ya tenés cuenta?
+              </Text>
+              <Link
+                href="/sign-in"
+                className="text-lg font-psemibold text-secondary"
+              >
+                Ingresá
+              </Link>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
