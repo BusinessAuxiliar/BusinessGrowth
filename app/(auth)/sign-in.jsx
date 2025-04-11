@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import CustomButton from "../../components/customButton";
 import { Link, router } from "expo-router";
-import { Platform, useWindowDimensions, View, Text, Image, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from "react-native";
+import {
+  Platform,
+  View,
+  Text,
+  Image,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import constants from "../../constants";
@@ -45,15 +53,28 @@ const SignIn = () => {
   return (
     <SafeAreaView className="bg-[#161622] flex-1">
       <StatusBar backgroundColor="#161622" />
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        className="flex-1"
+      >
+        <TouchableWithoutFeedback
+          onPress={Platform.OS !== "web" ? Keyboard.dismiss : undefined}
+          accessible={false}
+        >
           <View className="flex-1 justify-center px-4 py-6">
             <Image
               source={constants.images.logo}
-              style={{ width: 280, height: 140, alignSelf: "center", marginBottom: 30 }}
+              style={{
+                width: 280,
+                height: 140,
+                alignSelf: "center",
+                marginBottom: 30,
+              }}
               resizeMode="contain"
             />
-            <Text className="text-2xl text-white font-psemibold mb-5">Ingresá en BusinessGrowth</Text>
+            <Text className="text-2xl text-white font-psemibold mb-5">
+              Ingresá en BusinessGrowth
+            </Text>
 
             <FormField
               title="USUARIO"
@@ -78,8 +99,15 @@ const SignIn = () => {
             />
 
             <View className="justify-center pt-5 flex-row gap-2">
-              <Text className="text-lg text-gray-100 font-pregular">¿No tenes cuenta todavía?</Text>
-              <Link href="/sign-up" className="text-lg font-psemibold text-secondary">Registrate</Link>
+              <Text className="text-lg text-gray-100 font-pregular">
+                ¿No tenes cuenta todavía?
+              </Text>
+              <Link
+                href="/sign-up"
+                className="text-lg font-psemibold text-secondary"
+              >
+                Registrate
+              </Link>
             </View>
           </View>
         </TouchableWithoutFeedback>
