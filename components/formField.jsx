@@ -1,50 +1,43 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useState } from "react";
-import {CustomButton} from "../components/customButton"
- 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+
 const FormField = ({
   title,
   value,
   placeholder,
   handleChangeText,
   otherStyles,
-  ...props
 }) => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const isPassword = title?.toLowerCase() === "password";
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const isPasswordField = title.toLowerCase().includes("contraseña");
 
   return (
-    <View style={styles.wrapper}>
-      <Text className="text-base text-white font-pmedium">{title}</Text>
-
-      <View
-        style={[
-          styles.inputContainer,
-          { borderColor: isFocused ? "#4B5563" : "#ffffff" },
-        ]}
-      >
+    <View className={`space-y-2 ${otherStyles}`}>
+      <Text className="text-base text-gray-100 font-pmedium">{title}</Text>
+      <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
+          className="text-white flex-1 font-psemibold text-base"
           value={value}
           placeholder={placeholder}
-          placeholderTextColor="#A1A1AA"
+          placeholderTextColor="#7b7b8b"
           onChangeText={handleChangeText}
-          secureTextEntry={isPassword && !showPassword}
-          autoCapitalize="none"
-          cursorColor="#ffffff"
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          {...props}
+          secureTextEntry={isPasswordField && !isPasswordVisible}
+          style={styles.input}
         />
-
-        {isPassword && (
+        {isPasswordField && (
           <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
+            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
             style={styles.toggleButton}
           >
             <Text style={styles.toggleText}>
-              {showPassword ? "Ocultar" : "Mostrar"}
+              {isPasswordVisible ? "Ocultar" : "Mostrar"}
             </Text>
           </TouchableOpacity>
         )}
@@ -53,35 +46,34 @@ const FormField = ({
   );
 };
 
+export default FormField;
+
 const styles = StyleSheet.create({
-  wrapper: {
-    marginBottom: 24,
-  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2C2C30",
-    borderWidth: 2,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    height: 64,
+    backgroundColor: "#232533",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: "#383a4f",
   },
   input: {
     flex: 1,
-    color: "#ffffff",
+    color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
-    height: "100%",
   },
   toggleButton: {
     paddingLeft: 12,
     height: "100%",
     justifyContent: "center",
+    alignItems: "center",
+    minWidth: 70,
   },
   toggleText: {
-    color: "#ffffff",
+    color: "#A1A1AA",
     fontSize: 14,
+    fontWeight: "600",
   },
 });
-
-export default FormField;
