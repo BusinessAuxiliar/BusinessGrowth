@@ -17,13 +17,13 @@ const pool = mysql
   })
   .promise();
 
-app.use(cors());
+app.use(cors());  
 
 const testConnection = async () => {
   try {
-    const connection = await pool.getConnection(); // Intenta obtener una conexión
+    const connection = await pool.getConnection();
     console.log("✅ Conectado a la base de datos MySQL");
-    connection.release(); // Libera la conexión
+    connection.release(); 
   } catch (err) {
     console.error("❌ Error al conectar con MySQL:", err);
   }
@@ -32,28 +32,31 @@ testConnection();
 
 export default pool;
 
-// app.use('/assets/fonts', express.static(__dirname + '/Front-end/assets/fonts', {
-//     setHeaders: (res, path) => {
-//       if (path.endsWith('.ttf')) {
-//         res.setHeader('Content-Type', 'font/ttf');
-//       }
-//     }
-//   }));
 
 export async function getUserByUsername(username) {
   const [rows] = await pool.query(
     `SELECT * FROM usuarios WHERE usu_nombre = ?`,
     [username]
   );
-  return rows[0]; // devuelve el primer usuario
+  return rows[0];
 }
+
+
+export async function buscarUsuariosPorNombre(nombre) {
+  const [rows] = await pool.query(
+    'SELECT * FROM usuarios WHERE usu_nombre LIKE ?',
+    [`%${nombre}%`]
+  );
+  return rows;
+}
+
 
 export async function getUserById(usu_id) {
   const [row] = await createPool.query(`SELECT * FROM usuarios WHERE id = ?`, [
     usu_id,
   ]);
 
-  return row[0]; // tomamos solo el primerio porque es uno solo
+  return row[0]; 
 }
 
 export async function getEmpresaByEmpId(usu_id) {
@@ -65,7 +68,7 @@ export async function getEmpresaByEmpId(usu_id) {
  `,
     [usu_id]
   );
-  return rows; // tomamos varias por eso rows
+  return rows;
 }
 
 export async function getSucursalById(suc_id) {
@@ -77,7 +80,7 @@ export async function getSucursalById(suc_id) {
     `,
     [suc_id]
   );
-  return row[0]; // tomo solo la primer columna
+  return row[0]; 
 }
 
 export async function getEmailById(usu_id) {
@@ -87,6 +90,7 @@ export async function getEmailById(usu_id) {
   );
   return row;
 }
+
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en el puerto ${port}`);
