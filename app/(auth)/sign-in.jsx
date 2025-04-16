@@ -16,7 +16,12 @@ import constants from "../../constants";
 import FormField from "../../components/formField";
 
 const SignIn = () => {
-  const [form, setForm] = useState({ username: "", password: "" });
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+    empresa: "",
+    sucursal: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submit = async () => {
@@ -35,9 +40,9 @@ const SignIn = () => {
       });
 
       const data = await res.json();
-
       if (res.ok) {
         alert(`Bienvenido, ${data.username}`);
+      
         router.replace("/home");
       } else {
         alert(data.message);
@@ -47,6 +52,40 @@ const SignIn = () => {
       alert("Ocurrió un error. Intentá más tarde.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleUsernameChange = async (value) => {
+    setForm({ ...form, username: value });
+
+    if (value.length > 5) {
+      try {
+        const res = await fetch(
+          `http://192.168.100.37:3001/usuario/info/${value}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(),
+          }
+        );
+        const data = await res.json();
+
+        if (res.ok) {
+          setForm((prev) => ({
+            ...prev,
+            empresa: data.emp_nombre || "",
+            sucursal: data.suc_nombre || "",
+          }));
+        } else {
+          setForm((prev) => ({
+            ...prev,
+            empresa: "",
+            sucursal: "",
+          }));
+        }
+      } catch (error) {
+        console.error("Error al obtener info del usuario:", error);
+      }
     }
   };
 
@@ -80,7 +119,7 @@ const SignIn = () => {
               title="USUARIO"
               placeholder="Ingresá tu nombre de usuario"
               value={form.username}
-              handleChangeText={(e) => setForm({ ...form, username: e })}
+              handleChangeText={handleUsernameChange}
               otherStyles="mb-6"
             />
 
@@ -89,6 +128,24 @@ const SignIn = () => {
               placeholder="Ingresá tu contraseña"
               value={form.password}
               handleChangeText={(e) => setForm({ ...form, password: e })}
+            />
+
+            <FormField
+              title="EMPRESA"
+              placeholder="Empresa del usuario"
+              value={form.empresa}
+              handleChangeText={() => {}}
+              isDisabled={true}
+              otherStyles="mt-6"
+            />
+
+            <FormField
+              title="SUCURSAL"
+              placeholder="Sucursal asignada"
+              value={form.sucursal}
+              handleChangeText={() => {}}
+              isDisabled={true}
+              otherStyles="mt-6"
             />
 
             <CustomButton

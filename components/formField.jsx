@@ -13,30 +13,27 @@ const FormField = ({
   placeholder,
   handleChangeText,
   otherStyles,
+  isDisabled = false,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-
   const isPasswordField = title.toLowerCase().includes("contraseña");
 
   return (
     <View className={`space-y-2 ${otherStyles}`}>
-      <Text className="text-base text-gray-100 font-pmedium">{title}</Text>
-      <View style={styles.inputContainer}>
+      <Text className="text-white font-pmedium">{title}</Text>
+      <View className="flex-row items-center bg-[#252836] px-4 rounded-2xl">
         <TextInput
-          className="text-white flex-1 font-psemibold text-base"
-          value={value}
           placeholder={placeholder}
-          placeholderTextColor="#7b7b8b"
+          value={value}
           onChangeText={handleChangeText}
+          placeholderTextColor="#7b7b8b"
           secureTextEntry={isPasswordField && !isPasswordVisible}
-          style={styles.input}
+          editable={!isDisabled}
+          className="flex-1 text-white font-psemibold text-base py-4"
         />
         {isPasswordField && (
-          <TouchableOpacity
-            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-            style={styles.toggleButton}
-          >
-            <Text style={styles.toggleText}>
+          <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+            <Text className="text-white font-pmedium px-2">
               {isPasswordVisible ? "Ocultar" : "Mostrar"}
             </Text>
           </TouchableOpacity>
@@ -74,6 +71,6 @@ const styles = StyleSheet.create({
   toggleText: {
     color: "#A1A1AA",
     fontSize: 14,
-    fontWeight: "600",
+      fontWeight: "600",
   },
 });
