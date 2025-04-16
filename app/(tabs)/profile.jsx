@@ -52,6 +52,40 @@ const Profile = () => {
     }
   };
 
+  const handleUsernameChange = async (value) => {
+    setForm({ ...form, username: value });
+
+    if (value.length > 5) {
+      try {
+        const res = await fetch(
+          `http://192.168.100.37:3001/usuario/info/${value}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(),
+          }
+        );
+        const data = await res.json();
+
+        if (res.ok) {
+          setForm((prev) => ({
+            ...prev,
+            empresa: data.emp_nombre || "",
+            sucursal: data.suc_nombre || "",
+          }));
+        } else {
+          setForm((prev) => ({
+            ...prev,
+            empresa: "",
+            sucursal: "",
+          }));
+        }
+      } catch (error) {
+        console.error("Error al obtener info del usuario:", error);
+      }
+    }
+  };
+
   const renderUsuario = ({ item }) => (
     <View style={styles.userContainer}>
       <Text style={styles.userName}>👤 {item.usu_nombre}</Text>
