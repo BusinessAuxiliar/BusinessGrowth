@@ -40,13 +40,15 @@ export async function getUserByUsername(username) {
   return rows[0];
 }
 
+
 export async function buscarUsuariosPorNombre(nombre) {
   const [rows] = await pool.query(
-    "SELECT * FROM usuarios WHERE usu_nombre LIKE ?",
+    `SELECT * FROM usuarios WHERE usu_nombre LIKE ?`,
     [`%${nombre}%`]
   );
   return rows;
 }
+
 
 export async function getEmpresaByUsername(usu_nombre) {
   const [row] = await pool.query(
@@ -58,6 +60,7 @@ export async function getEmpresaByUsername(usu_nombre) {
   return row[0];
 }
 
+
 export async function getUserById(usu_id) {
   const [row] = await pool.query(`SELECT * FROM usuarios WHERE id = ?`, [
     usu_id,
@@ -65,6 +68,7 @@ export async function getUserById(usu_id) {
 
   return row[0];
 }
+
 
 export async function getEmpresaByEmpId(usu_id) {
   const [rows] = await pool.query(
@@ -77,6 +81,7 @@ export async function getEmpresaByEmpId(usu_id) {
   );
   return rows;
 }
+
 
 export async function getSucursalById(suc_id) {
   const [row] = await pool.query(
@@ -105,9 +110,10 @@ export async function getEmpresaYSucursalByUsername(usu_nombre) {
   return rows;
 }
 
+
 export async function getEmailById(usu_id) {
   const [row] = await pool.query(
-    `SELECT usuarios.usu_email FROM usuarios WHERE id = ?`,
+    `SELECT usuarios.usu_email FROM usuarios WHERE usu_id = ?`,
     [usu_id]
   );
   return row;
