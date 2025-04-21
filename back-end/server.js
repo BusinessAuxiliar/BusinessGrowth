@@ -12,16 +12,16 @@ app.use(cors({ origin: "*", methods: ["POST", "GET"], credentials: true }));
 app.use(express.json());
 const port = 3001;
 
-app.get("/sign-in", async (req, res) => {
-  const { usu_nombre } = req.params;
-  try {
-    const empresa = await getEmpresaByUsername(usu_nombre);
-    return res.status(200).send(empresa);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ error: "Error obteniendo empresa" });
-  }
-});
+// app.get("/sign-in", async (req, res) => {
+//   const { usu_nombre } = req.params;
+//   try {
+//     const empresa = await getEmpresaByUsername(usu_nombre);
+//     return res.status(200).send(empresa);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send({ error: "Error obteniendo empresa" });
+//   }
+// });
 
 app.get("/usuario/info/:usu_nombre", async (req, res) => {
   try {

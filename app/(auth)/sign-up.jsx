@@ -15,6 +15,7 @@ import { StatusBar } from "expo-status-bar";
 import constants from "../../constants";
 import FormField from "../../components/formField";
 
+
 const SignUp = () => {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);

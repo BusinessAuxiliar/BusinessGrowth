@@ -15,6 +15,7 @@ import { StatusBar } from "expo-status-bar";
 import constants from "../../constants";
 import FormField from "../../components/formField";
 
+
 const SignIn = () => {
   const [form, setForm] = useState({
     username: "",
@@ -29,9 +30,7 @@ const SignIn = () => {
       alert("Completa ambos campos");
       return;
     }
-
     setIsSubmitting(true);
-
     try {
       const res = await fetch("http://192.168.100.37:3001/sign-in", {
         method: "POST",
@@ -54,27 +53,27 @@ const SignIn = () => {
       setIsSubmitting(false);
     }
   };
-
   const handleUsernameChange = async (value) => {
     setForm({ ...form, username: value });
-
-    if (value.length > 5) {
+  
+    if (value.length > 2) {
       try {
         const res = await fetch(
           `http://192.168.100.37:3001/usuario/info/${value}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(),
           }
         );
+  
         const data = await res.json();
-
-        if (res.ok) {
+        console.log("👉 Info del usuario:", data);
+  
+        if (res.ok && data.length > 0) {
           setForm((prev) => ({
             ...prev,
-            empresa: data.emp_nombre || "",
-            sucursal: data.suc_nombre || "",
+            empresa: data[0].emp_nombre || "",
+            sucursal: data[0].suc_nombre || "",
           }));
         } else {
           setForm((prev) => ({
@@ -85,6 +84,11 @@ const SignIn = () => {
         }
       } catch (error) {
         console.error("Error al obtener info del usuario:", error);
+        setForm((prev) => ({
+          ...prev,
+          empresa: "",
+          sucursal: "",
+        }));
       }
     }
   };
