@@ -15,7 +15,6 @@ import { StatusBar } from "expo-status-bar";
 import constants from "../../constants";
 import FormField from "../../components/formField";
 
-
 const SignIn = () => {
   const [form, setForm] = useState({
     username: "",
@@ -41,7 +40,7 @@ const SignIn = () => {
       const data = await res.json();
       if (res.ok) {
         alert(`Bienvenido, ${data.username}`);
-      
+
         router.replace("/home");
       } else {
         alert(data.message);
@@ -53,9 +52,10 @@ const SignIn = () => {
       setIsSubmitting(false);
     }
   };
+
   const handleUsernameChange = async (value) => {
     setForm({ ...form, username: value });
-  
+
     if (value.length > 2) {
       try {
         const res = await fetch(
@@ -65,10 +65,10 @@ const SignIn = () => {
             headers: { "Content-Type": "application/json" },
           }
         );
-  
+
         const data = await res.json();
         console.log("👉 Info del usuario:", data);
-  
+
         if (res.ok && data.length > 0) {
           setForm((prev) => ({
             ...prev,
