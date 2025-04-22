@@ -4,8 +4,6 @@ import express from "express";
 import cors from "cors";
 
 dotenv.config();
-
-const port = 3001;
 const app = express();
 
 const pool = mysql
@@ -40,7 +38,6 @@ export async function getUserByUsername(username) {
   return rows[0];
 }
 
-
 export async function buscarUsuariosPorNombre(nombre) {
   const [rows] = await pool.query(
     `SELECT * FROM usuarios WHERE usu_nombre LIKE ?`,
@@ -49,6 +46,12 @@ export async function buscarUsuariosPorNombre(nombre) {
   return rows;
 }
 
+export async function getAccesoSucursalByUsuId(usu_id) {
+  const [rows] = await pool.query(
+    `SELECT * from usuarios_sucursales WHERE usu_id = ?`, [usu_id]
+  );  
+  return rows;
+}
 
 export async function getEmpresaByUsername(usu_nombre) {
   const [row] = await pool.query(
@@ -60,7 +63,6 @@ export async function getEmpresaByUsername(usu_nombre) {
   return row[0];
 }
 
-
 export async function getUserById(usu_id) {
   const [row] = await pool.query(`SELECT * FROM usuarios WHERE id = ?`, [
     usu_id,
@@ -68,7 +70,6 @@ export async function getUserById(usu_id) {
 
   return row[0];
 }
-
 
 export async function getEmpresaByEmpId(usu_id) {
   const [rows] = await pool.query(
@@ -82,7 +83,6 @@ export async function getEmpresaByEmpId(usu_id) {
   return rows;
 }
 
-
 export async function getSucursalById(suc_id) {
   const [row] = await pool.query(
     `SELECT sucursales.*
@@ -95,9 +95,9 @@ export async function getSucursalById(suc_id) {
   return row[0];
 }
 
-
 export async function getEmpresaYSucursalByUsername(usu_nombre) {
-  const [rows] = await pool.query(`
+  const [rows] = await pool.query(
+    `
     SELECT 
       empresas.emp_nombre,
       sucursales.suc_nombre
@@ -105,11 +105,12 @@ export async function getEmpresaYSucursalByUsername(usu_nombre) {
     LEFT JOIN empresas ON usuarios.emp_id = empresas.emp_id
     LEFT JOIN sucursales ON usuarios.suc_id = sucursales.suc_id
     WHERE usuarios.usu_nombre = ?
-  `, [usu_nombre]);
+  `,
+    [usu_nombre]
+  );
 
   return rows;
 }
-
 
 export async function getEmailById(usu_id) {
   const [row] = await pool.query(

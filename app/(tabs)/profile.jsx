@@ -1,179 +1,106 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { View, Text, TextInput, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  View,
-  TextInput,
-  Text,
-  FlatList,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 const Profile = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [usuarios, setUsuarios] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (searchTerm.trim() !== "") {
-        buscarUsuarios(searchTerm);
-      } else {
-        setUsuarios([]);
-      }
-    }, 500);
-
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm]);
-
-  const buscarUsuarios = async (nombre) => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `http://192.168.100.37:3001/profile/${nombre}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setUsuarios(data);
-      } else {
-        setUsuarios([]);
-      }
-    } catch (error) {
-      console.error("Error al buscar usuarios:", error);
-      setUsuarios([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [username, setUsername] = useState("");
+  const [empresa, setEmpresa] = useState("");
+  const [sucursal, setSucursal] = useState("");
+  const [sucursales, setSucursales] = useState([]);
 
   const handleUsernameChange = async (value) => {
-    setForm({ ...form, username: value });
+    setUsername(value);
 
-    if (value.length > 5) {
+    if (value.length > 2) {
       try {
         const res = await fetch(
           `http://192.168.100.37:3001/usuario/info/${value}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(),
           }
         );
+
         const data = await res.json();
 
-        if (res.ok) {
-          setForm((prev) => ({
-            ...prev,
-            empresa: data.emp_nombre || "",
-            sucursal: data.suc_nombre || "",
-          }));
+        console.log("Respuesta de /usuario/info:", data);
+        if (res.ok && data.length > 0) {
+          const usuario = data[0];
+          const usu_id = usuario.usu_id;
+
+          setEmpresa(usuario.emp_nombre || "");
+          setSucursal(usuario.suc_nombre || "");
+
+          if (usu_id) {
+            const sucRes = await fetch(
+              `http://192.168.100.37:3001/usuario/sucursales/${usu_id}`
+            );
+
+            if (!sucRes.ok) {
+              console.warn("Error al obtener sucursales:", sucRes.status);
+              setSucursales([]);
+              return;
+            }
+
+            const sucData = await sucRes.json();
+            setSucursales(sucData);
+          } else {
+            console.warn("usu_id no definido");
+            setSucursales([]);
+          }
         } else {
-          setForm((prev) => ({
-            ...prev,
-            empresa: "",
-            sucursal: "",
-          }));
+          setEmpresa("");
+          setSucursal("");
+          setSucursales([]);
         }
       } catch (error) {
-        console.error("Error al obtener info del usuario:", error);
+        console.error("Error en Profile:", error);
+        setEmpresa("");
+        setSucursal("");
+        setSucursales([]);
       }
+    } else {
+      setEmpresa("");
+      setSucursal("");
+      setSucursales([]);
     }
   };
 
-  const renderUsuario = ({ item }) => (
-    <View style={styles.userContainer}>
-      <Text style={styles.userName}>👤 {item.usu_nombre}</Text>
-      <Text style={styles.userEmail}>📧 {item.usu_email}</Text>
-      <Text style={styles.userEmpresa}>🏢 Empresa: {item.empresa}</Text>
-      <Text style={styles.userSucursales}>
-        🏬 Sucursales:{" "}
-        {item.sucursales?.length > 0
-          ? item.sucursales.join(", ")
-          : "No asociadas"}
-      </Text>
-    </View>
-  );
-
   return (
-    <SafeAreaView className="bg-[#161622] flex-1">
-      <View style={styles.container}>
-        <TextInput
-          placeholder="🔍 Buscar usuario por nombre..."
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-          style={styles.input}
-        />
+    <SafeAreaView className="bg-[#161622] flex-1 p-5">
+      <StatusBar backgroundColor="#161622" />
+      <Text className="text-white text-2xl font-bold mb-4">
+        Buscar Usuario
+      </Text>
 
-        {loading && <ActivityIndicator size="large" color="#007AFF" />}
+      <TextInput
+        className="bg-white rounded-lg p-3 mb-4"
+        placeholder="Ingresá nombre de usuario"
+        value={username}
+        onChangeText={handleUsernameChange}
+      />
 
-        <FlatList
-          data={usuarios}
-          keyExtractor={(item) => item.usu_id.toString()}
-          renderItem={renderUsuario}
-          ListEmptyComponent={
-            !loading && (
-              <Text style={styles.noResults}>No se encontraron usuarios.</Text>
-            )
-          }
-        />
-      </View>
+      <Text className="text-white text-lg mb-2">Empresa: {empresa}</Text>
+      <Text className="text-white text-lg mb-4">Sucursal: {sucursal}</Text>
+
+      <Text className="text-white text-lg font-semibold mb-2">
+        Sucursales asignadas:
+      </Text>
+
+      <ScrollView className="bg-white rounded-lg p-3 max-h-[250px]">
+        {sucursales.length > 0 ? (
+          sucursales.map((suc, index) => (
+            <Text key={index} className="text-black text-base mb-1">
+              - {suc.suc_nombre}
+            </Text>
+          ))
+        ) : (
+          <Text className="text-gray-500 text-base">No hay sucursales.</Text>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 export default Profile;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    paddingTop: 40,
-    backgroundColor: "#161622",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 16,
-    fontSize: 16,
-    color: "#fff",
-  },
-  userContainer: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderColor: "#eee",
-    color: "#fff"
-  },
-  userName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff"
-  },
-  userEmail: {
-    fontSize: 14,
-   color: "#fff"
-    
-  },
-  userEmpresa: {
-    fontSize: 14,
-    marginTop: 4,
-    color: "#fff",
-  },
-  userSucursales: {
-    fontSize: 14,
-    marginTop: 2,
-    color: "#fff",
-  },
-  noResults: {
-    textAlign: "center",
-    color: "#fff",
-    marginTop: 20,
-  },
-});

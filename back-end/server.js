@@ -5,6 +5,7 @@ import {
   getEmpresaYSucursalByUsername,
   buscarUsuariosPorNombre,
   getEmpresaByUsername,
+  getAccesoSucursalByUsuId,
 } from "./app.js";
 
 const app = express();
@@ -29,6 +30,29 @@ app.get("/usuario/info/:usu_nombre", async (req, res) => {
     const info = await getEmpresaYSucursalByUsername(usu_nombre);
     if (!info)
       return res.status(404).json({ message: "Usuario no encontrado" });
+    res.status(200).json(info);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+});
+
+app.get("/usuario/sucursales/:usu_id", async (req, res) => {
+  try {
+    const rows = await getAccesoSucursalByUsuId(req.params.usu_id);
+    res.json(rows);
+  } catch (error) {
+    console.error("Error al obtener sucursales del usuario:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+});
+
+app.get("/profile/:usu_id", async (req, res) => {
+  try {
+    const { usu_id } = req.params;
+    const info = await getAccesoSucursalByUsuId(usu_id);
+    if (!info)
+      return res.status(404).json({ message: "Accesos no encontrados" });
     res.status(200).json(info);
   } catch (err) {
     console.error(err);
@@ -64,6 +88,7 @@ app.post("/sign-in", async (req, res) => {
     res.status(500).json({ message: "Error interno del servidor" });
   }
 });
+
 app.get("/empresa/usuarios/:emp_id", async (req, res) => {
   try {
     const empresaDelUsuario = await getEmpresaByEmpId(req.params.emp_id);
@@ -83,7 +108,7 @@ app.get("/sucursal/usuarios/:suc_id", async (req, res) => {
   }
 });
 
-app.get("/profile/:nombre", async (req, res) => {
+app.get("/profile/buscar/:nombre", async (req, res) => {
   const nombre = req.params.nombre;
 
   try {
